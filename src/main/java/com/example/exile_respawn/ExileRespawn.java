@@ -87,27 +87,26 @@ public class ExileRespawn {
         ServerLevel level = player.serverLevel();
         RandomSource random = level.random;
 
-        // 半径
-        // TODO: ゲームルールから取得した値を使う
-        int radius = level.getGameRules()
-                .getRule(ExileRespawnGameRules.RESPAWN_RADIUS)
-                .get();
-        LOGGER.info("半径は{}だよ", radius);
-        double baseRadius = 10000;
-        double jitter = 3000; // 誤差を入れる
-        double r = baseRadius + (random.nextDouble() * 2 - 1) * jitter;
+        // Exile RespawnのゲームモードがONなら、遠くにリスポーンする
+        if (level.getGameRules().getRule(ExileRespawnGameRules.EXILE_RESPAWN).get()) {
+            // 半径
+            int radius = level.getGameRules().getRule(ExileRespawnGameRules.EXILE_RESPAWN_RADIUS).get();
+            int looseness = level.getGameRules().getRule(ExileRespawnGameRules.EXILE_RESPAWN_LOOSENESS).get();
+            LOGGER.debug("遠くにリスポーンします（半径: {}, 緩さ: {}）", radius, looseness);
+            double distance = radius + (random.nextDouble() * 2 - 1) * looseness;
 
-        // 飛ばされる方向
-        double theta = random.nextDouble() * Math.PI * 2;
-        int x = (int) (player.blockPosition().getX() + r * Math.cos(theta));
-        int z = (int) (player.blockPosition().getZ() + r * Math.sin(theta));
+            // 飛ばされる方向
+            double theta = random.nextDouble() * Math.PI * 2;
+            int x = (int) (player.blockPosition().getX() + distance * Math.cos(theta));
+            int z = (int) (player.blockPosition().getZ() + distance * Math.sin(theta));
 
-        // 地中・空中を避ける
-        level.getChunk(x >> 4, z >> 4); // チャンクをロード
-        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            // 地中・空中を避ける
+            level.getChunk(x >> 4, z >> 4); // チャンクをロード
+            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
-        // テレポート
-        player.teleportTo(x, y, z);
+            // テレポート
+            player.teleportTo(x, y, z);
+        }
     }
 
     /**
