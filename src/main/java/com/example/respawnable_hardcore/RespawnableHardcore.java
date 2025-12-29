@@ -7,6 +7,9 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,7 +19,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -69,27 +72,34 @@ public class RespawnableHardcore {
         LOGGER.info("サーバ立ち上げ中だよ🛴");
     }
 
+    /**
+     * プレイヤーがリスポーンするときの処理を書き換える
+     * 
+     * @param event
+     */
     @SubscribeEvent
-    public void onLivingDeath(LivingDeathEvent event) {
-        LOGGER.info("エンティティが死亡しました！ {}", event.getEntity());
+    public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
 
         ServerLevel level = player.serverLevel();
-        if (!level.getLevelData().isHardcore()) {
-            return;
-        }
+        RandomSource random = level.random;
 
-        // ここに「Compassionate Hardcore 的処理」を書く
-        // event.setCanceled(true);
-        // player.setHealth(100.0F);
+        // 半径
+        double baseRadius = 10000;
+        double jitter = 3000; // 誤差を入れる
+        double r = baseRadius + (random.nextDouble() * 2 - 1) * jitter;
 
-        event.setCanceled(true); // ← 超重要
-        player.setHealth(player.getMaxHealth() / 2);
-        player.removeAllEffects();
-        player.teleportTo(0,
-                300,
-                0);
+        // 飛ばされる方向
+        double theta = random.nextDouble() * Math.PI * 2;
+
+        // テレポート
+        double x = player.blockPosition().getX() + r * Math.cos(theta);
+        double z = player.blockPosition().getZ() + r * Math.sin(theta);
+        player.teleportTo(x, 300, z);
+
+        // バフ付与（低速落下30秒）
+        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20 * 30, 0, true, true));
     }
 }
