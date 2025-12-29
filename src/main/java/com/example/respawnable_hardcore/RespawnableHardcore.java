@@ -88,6 +88,11 @@ public class RespawnableHardcore {
         RandomSource random = level.random;
 
         // 半径
+        // TODO: ゲームルールから取得した値を使う
+        int radius = level.getGameRules()
+                .getRule(ModGameRules.RESPAWN_RADIUS)
+                .get();
+        LOGGER.info("半径は{}だよ", radius);
         double baseRadius = 10000;
         double jitter = 3000; // 誤差を入れる
         double r = baseRadius + (random.nextDouble() * 2 - 1) * jitter;
