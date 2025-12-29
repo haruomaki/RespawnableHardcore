@@ -5,12 +5,12 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
@@ -20,6 +20,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -73,7 +74,7 @@ public class RespawnableHardcore {
     }
 
     /**
-     * プレイヤーがリスポーンするときの処理を書き換える
+     * プレイヤーがリスポーンした直後、遠くにテレポートする。
      * 
      * @param event
      */
@@ -93,13 +94,30 @@ public class RespawnableHardcore {
 
         // 飛ばされる方向
         double theta = random.nextDouble() * Math.PI * 2;
+        int x = (int) (player.blockPosition().getX() + r * Math.cos(theta));
+        int z = (int) (player.blockPosition().getZ() + r * Math.sin(theta));
+
+        // 地中・空中を避ける
+        level.getChunk(x >> 4, z >> 4); // チャンクをロード
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
         // テレポート
-        double x = player.blockPosition().getX() + r * Math.cos(theta);
-        double z = player.blockPosition().getZ() + r * Math.sin(theta);
-        player.teleportTo(x, 300, z);
+        player.teleportTo(x, y, z);
+    }
 
-        // バフ付与（低速落下30秒）
-        player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20 * 30, 0, true, true));
+    /**
+     * ベット使用時 or リスポーン時にメッセージ表示
+     * 
+     * @param event
+     */
+    @SubscribeEvent
+    public void onSleep(PlayerSetSpawnEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player))
+            return;
+
+        // TODO: これいつ表示されるの？
+        player.displayClientMessage(
+                Component.literal("この世界ではベッドはスポーン地点にならない。"),
+                false);
     }
 }
