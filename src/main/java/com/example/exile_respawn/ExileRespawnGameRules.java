@@ -1,10 +1,10 @@
-package com.example.respawnable_hardcore;
+package com.example.exile_respawn;
 
 import net.neoforged.fml.common.Mod;
 import net.minecraft.world.level.GameRules;
 
-@Mod(RespawnableHardcore.MODID)
-public class ModGameRules {
+@Mod(ExileRespawn.MODID)
+public class ExileRespawnGameRules {
 
     public static final GameRules.Key<GameRules.BooleanValue> RANDOM_RESPAWN = GameRules.register(
             "randomRespawn", // /gamerule 名

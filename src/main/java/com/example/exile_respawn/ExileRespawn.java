@@ -1,4 +1,4 @@
-package com.example.respawnable_hardcore;
+package com.example.exile_respawn;
 
 import org.slf4j.Logger;
 
@@ -24,16 +24,16 @@ import net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
-@Mod(RespawnableHardcore.MODID)
-public class RespawnableHardcore {
+@Mod(ExileRespawn.MODID)
+public class ExileRespawn {
     // Define mod id in a common place for everything to reference
-    public static final String MODID = "respawnable_hardcore";
+    public static final String MODID = "exile_respawn";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
-    public RespawnableHardcore(IEventBus modEventBus, ModContainer modContainer) {
+    public ExileRespawn(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
 
@@ -90,7 +90,7 @@ public class RespawnableHardcore {
         // 半径
         // TODO: ゲームルールから取得した値を使う
         int radius = level.getGameRules()
-                .getRule(ModGameRules.RESPAWN_RADIUS)
+                .getRule(ExileRespawnGameRules.RESPAWN_RADIUS)
                 .get();
         LOGGER.info("半径は{}だよ", radius);
         double baseRadius = 10000;
