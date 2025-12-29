@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,6 +16,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -64,5 +67,29 @@ public class RespawnableHardcore {
     public void onServerStarting(ServerStartingEvent event) {
         // Do something when the server starts
         LOGGER.info("サーバ立ち上げ中だよ🛴");
+    }
+
+    @SubscribeEvent
+    public void onLivingDeath(LivingDeathEvent event) {
+        LOGGER.info("エンティティが死亡しました！ {}", event.getEntity());
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+
+        ServerLevel level = player.serverLevel();
+        if (!level.getLevelData().isHardcore()) {
+            return;
+        }
+
+        // ここに「Compassionate Hardcore 的処理」を書く
+        // event.setCanceled(true);
+        // player.setHealth(100.0F);
+
+        event.setCanceled(true); // ← 超重要
+        player.setHealth(player.getMaxHealth() / 2);
+        player.removeAllEffects();
+        player.teleportTo(0,
+                300,
+                0);
     }
 }
