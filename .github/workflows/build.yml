@@ -41,7 +41,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: Kir-Antipov/mc-publish@v3
         with:
-          modrinth-id: YOUR_PROJECT_ID
+          modrinth-id: exile-respawn
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           files: build/libs/*.jar
