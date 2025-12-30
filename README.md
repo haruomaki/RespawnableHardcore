@@ -1,7 +1,5 @@
 # Exile Respawn
 
-![a](src\main\resources\logo.png)
-
 **Death does not send you back home.  
 It sends you away.**
 
