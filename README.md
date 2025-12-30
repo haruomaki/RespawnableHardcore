@@ -1,25 +1,44 @@
+# Exile Respawn
 
-Installation information
-=======
+![a](src\main\resources\logo.png)
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+**Death does not send you back home.  
+It sends you away.**
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+Exile Respawn is a Minecraft mod that changes how respawning works.  
+When enabled, **players respawn far away from their death location**, regardless spawn points.
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+This behavior is controlled via a gamerule, allowing full flexibility for singleplayer and servers.
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+The mod is philosophically inspired by **Better Than Wolves** and **Compassionate Hardcore**.
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+---
+
+## What This Mod Does
+
+When the Exile Respawn gamerule is enabled:
+
+- Any player death causes a **distant respawn**
+- The respawn location is:
+  - Far away from the previous position
+  - Chosen to avoid immediate lethal hazards (lava, void, fatal drops, etc.)
+- This applies to:
+  - Survival
+  - Multiplayer servers
+
+No items are preserved.  
+No teleportation back is provided.
+
+You die — and you start somewhere else.
+
+---
+
+## Gamerule
+
+Exile Respawn is enabled by default.
+
+Enable it with:
+
+```mcfunction
+/gamerule exileRespawn true
+```
