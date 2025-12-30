@@ -1,0 +1,8 @@
+{
+    "gamerule.exileRespawn": "流刑リスポーン",
+    "gamerule.exileRespawn.description": "有効にすると、プレイヤーは死亡地点から遠く離れた場所にリスポーンします。",
+    "gamerule.exileRespawnRadius": "流刑距離",
+    "gamerule.exileRespawnRadius.description": "死亡地点からリスポーンするまでの基本距離（ブロック）。",
+    "gamerule.exileRespawnLooseness": "流刑距離のばらつき",
+    "gamerule.exileRespawnLooseness.description": "リスポーン距離に加えられるランダムな変動量。"
+}

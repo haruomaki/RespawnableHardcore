@@ -1,0 +1,8 @@
+{
+    "gamerule.exileRespawn": "Exile Respawn",
+    "gamerule.exileRespawn.description": "When enabled, players respawn far away from their death location.",
+    "gamerule.exileRespawnRadius": "Exile Respawn Radius",
+    "gamerule.exileRespawnRadius.description": "Base distance (in blocks) from the death location where the player respawns.",
+    "gamerule.exileRespawnLooseness": "Exile Respawn Looseness",
+    "gamerule.exileRespawnLooseness.description": "Random variation added to the respawn distance."
+}
