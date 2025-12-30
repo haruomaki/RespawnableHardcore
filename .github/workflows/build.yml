@@ -2,9 +2,10 @@ name: Build & Release
 
 on:
   push:
-    tags:
-      - 'v*'
   pull_request:
+
+permissions:
+  contents: write   # Release 作成用（明示）
 
 jobs:
   build:
@@ -28,7 +29,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-      # 🔽 ここから Release 用（tag のときだけ）
+      # 🔽 tag のときだけ Release
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
