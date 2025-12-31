@@ -1,3 +1,7 @@
+[![modrinth](https://img.shields.io/badge/Modrinth-Exile%20Respawn-black?style=for-the-badge&logo=modrinth&labelColor=snow)](https://modrinth.com/mod/exile-respawn)
+[![Build](https://github.com/haruomaki/exile-respawn/actions/workflows/build.yml/badge.svg)](https://github.com/haruomaki/exile-respawn/actions/workflows/build.yml)
+
+
 # Exile Respawn
 
 **Death does not send you back home.  
