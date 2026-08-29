@@ -65,7 +65,8 @@ public class ExileRespawn {
             return;
         }
 
-        ServerLevel level = player.serverLevel();
+        // `.serverLevel()` has been removed in Minecraft 1.21.6 and later.
+        var level = (ServerLevel) player.level();
         RandomSource random = level.random;
 
         // ハードコアでない、かつExile RespawnのゲームモードがONなら遠くにリスポーンする

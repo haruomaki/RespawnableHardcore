@@ -44,3 +44,24 @@ Enable it with:
 ```mcfunction
 /gamerule exileRespawn true
 ```
+
+## Building from source
+
+### Prerequisites
+* JDK 21 or higher
+
+```pwsh
+.\gradlew.bat build  # build
+.\gradlew.bat runClient  # run
+```
+
+Here are the places to rewrite when updating versions  
+For a Minecraft (NeoForge) mod, when changing the supported version, you mainly need to modify the following files:
+
+**gradle.properties**
+
+- `minecraft_version` (e.g., 1.21 → 1.21.4)  
+- `neo_version` (the NeoForge version corresponding to that Minecraft version)  
+- (if used) `parchment_minecraft_version` and other mapping data  
+
+This is for a GitHub public repository, so please use English.
