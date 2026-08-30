@@ -1,4 +1,4 @@
-package com.example.exile_respawn;
+package jp.haruomaki.exile_respawn;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
