@@ -3,7 +3,6 @@ package com.example.exile_respawn;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,7 +11,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -26,24 +24,23 @@ public class ExileRespawn {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    BlockPos deathPos;
+    private BlockPos deathPos;
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public ExileRespawn(IEventBus modEventBus, ModContainer modContainer) {
         // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
+        // Note that this is necessary if and only if we want *this* class (ExileRespawn) to respond directly to events.
         NeoForge.EVENT_BUS.register(this);
 
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        // Register the game rules.
+        ExileRespawnGameRules.register(modEventBus);
     }
 
     /**
-     * プレイヤーの死亡地点を記録する。
+     * Records the exact coordinates where a player died.
      * 
-     * @param event
+     * @param event The living death event
      */
     @SubscribeEvent
     public void onLivingDeath(LivingDeathEvent event) {
@@ -55,9 +52,9 @@ public class ExileRespawn {
     }
 
     /**
-     * プレイヤーがリスポーンした直後、遠くにテレポートする。
+     * Teleports the player away from their death location immediately upon respawning.
      * 
-     * @param event
+     * @param event The player respawn event
      */
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
@@ -69,30 +66,31 @@ public class ExileRespawn {
         var level = (ServerLevel) player.level();
         RandomSource random = level.random;
 
-        // ハードコアでない、かつExile RespawnのゲームモードがONなら遠くにリスポーンする
-        if (!level.getLevelData().isHardcore() && level.getGameRules().getRule(ExileRespawnGameRules.EXILE_RESPAWN).get()) {
-            // 半径
-            int radius = level.getGameRules().getRule(ExileRespawnGameRules.EXILE_RESPAWN_RADIUS).get();
-            int looseness = level.getGameRules().getRule(ExileRespawnGameRules.EXILE_RESPAWN_LOOSENESS).get();
-            double distance = radius + (random.nextDouble() * 2 - 1) * looseness;
+        // Teleport the player if the world is not hardcore and the custom gamerule is enabled
+        // if (!level.getLevelData().isHardcore() && level.getGameRules().get(ExileRespawnGameRules.EXILE_RESPAWN.)) {
+        // // Configuration rules for calculation
+        // int radius = ExileRespawnGameRules.EXILE_RESPAWN_RADIUS.get().defaultValue();
+        // // int radius = level.getGameRules().get(ExileRespawnGameRules.EXILE_RESPAWN_RADIUS);
+        // int looseness = level.getGameRules().get(ExileRespawnGameRules.EXILE_RESPAWN_LOOSENESS);
+        // double distance = radius + (random.nextDouble() * 2 - 1) * looseness;
 
-            // 飛ばされる方向
-            int deathX = deathPos.getX();
-            int deathY = deathPos.getY();
-            int deathZ = deathPos.getZ();
-            double theta = random.nextDouble() * Math.PI * 2;
-            int x = (int) (deathX + distance * Math.cos(theta));
-            int z = (int) (deathZ + distance * Math.sin(theta));
+        // // Target coordinates logic
+        // int deathX = deathPos.getX();
+        // int deathY = deathPos.getY();
+        // int deathZ = deathPos.getZ();
+        // double theta = random.nextDouble() * Math.PI * 2;
+        // int x = (int) (deathX + distance * Math.cos(theta));
+        // int z = (int) (deathZ + distance * Math.sin(theta));
 
-            // 地中・空中を避ける
-            level.getChunk(x >> 4, z >> 4); // チャンクをロード
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        // // Force load the chunk to find a safe surface height
+        // level.getChunk(x >> 4, z >> 4);
+        // int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
-            // テレポート
-            LOGGER.debug("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
-            LOGGER.debug(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
-            LOGGER.debug("Respawn Position: ({}, {}, {})", x, y, z);
-            player.teleportTo(x, y, z);
-        }
+        // // Log details and execute teleportation
+        // LOGGER.debug("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
+        // LOGGER.debug(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
+        // LOGGER.debug("Respawn Position: ({}, {}, {})", x, y, z);
+        // player.teleportTo(x, y, z);
+        // }
     }
 }
