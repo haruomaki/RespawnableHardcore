@@ -17,11 +17,11 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
-@Mod(ExileRespawn.MODID)
+@Mod(ExileRespawn.MOD_ID)
 public class ExileRespawn {
     // Define mod id in a common place for everything to reference
-    // TODO: gradle.propertiesから読み込み
-    public static final String MODID = "exile_respawn";
+    // Read from gradle.properties instead; tried to eliminate this duplication, but gave up for now.
+    public static final String MOD_ID = "exile_respawn";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -87,9 +87,9 @@ public class ExileRespawn {
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
             // Log details and execute teleportation
-            LOGGER.debug("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
-            LOGGER.debug(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
-            LOGGER.debug("Respawn Position: ({}, {}, {})", x, y, z);
+            LOGGER.info("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
+            LOGGER.info(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
+            LOGGER.info("Respawn Position: ({}, {}, {})", x, y, z);
             player.teleportTo(x, y, z);
         }
     }

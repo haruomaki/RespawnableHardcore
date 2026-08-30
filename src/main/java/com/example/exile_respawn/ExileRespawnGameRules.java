@@ -14,7 +14,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ExileRespawnGameRules {
-    public static final DeferredRegister<GameRule<?>> GAME_RULES = DeferredRegister.create(Registries.GAME_RULE, ExileRespawn.MODID);
+    private static final DeferredRegister<GameRule<?>> GAME_RULES = DeferredRegister.create(Registries.GAME_RULE, ExileRespawn.MOD_ID);
 
     public static final DeferredHolder<GameRule<?>, GameRule<Boolean>> ENABLED = GAME_RULES.register("enabled", id -> new GameRule<>(
             GameRuleCategory.PLAYER,
@@ -46,6 +46,7 @@ public class ExileRespawnGameRules {
             3000,
             FeatureFlagSet.of()));
 
+    // The DeferredRegister must be attached to the mod event bus to perform registration.
     public static void register(IEventBus modBus) {
         GAME_RULES.register(modBus);
     }
