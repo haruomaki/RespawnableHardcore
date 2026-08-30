@@ -22,7 +22,8 @@ repositories {
 }
 
 base {
-    archivesName = "exile-respawn" // ファイル名はケバブケースにしたいので明示
+    // Standardized file name derived from mod_name with spaces removed (PascalCase)
+    archivesName = "${mod_name}".replace(" ", "")
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.

@@ -35,9 +35,6 @@ public class ExileRespawn {
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
         NeoForge.EVENT_BUS.register(this);
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     /**
@@ -89,9 +86,9 @@ public class ExileRespawn {
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
             // テレポート
-            LOGGER.debug("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
-            LOGGER.debug(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
-            LOGGER.debug("Respawn Position: ({}, {}, {})", x, y, z);
+            LOGGER.info("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
+            LOGGER.info(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
+            LOGGER.info("Respawn Position: ({}, {}, {})", x, y, z);
             player.teleportTo(x, y, z);
         }
     }
