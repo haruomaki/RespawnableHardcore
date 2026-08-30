@@ -7,12 +7,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.Entity;
 
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
+
     @Inject(method = "respawn", at = @At("HEAD"))
-    private void exileRespawn$debugRespawn(ServerPlayer player, boolean keepInventory, CallbackInfoReturnable<ServerPlayer> cir) {
+    private void exileRespawn$debugRespawn(
+            ServerPlayer player,
+            boolean keepInventory,
+            Entity.RemovalReason removalReason,
+            CallbackInfoReturnable<ServerPlayer> cir) {
+
         System.out.println("[ExileRespawn] PlayerList#respawn reached at HEAD");
-        System.out.println("[ExileRespawn] player=" + player.getScoreboardName() + ", keepInventory=" + keepInventory);
+        System.out.println(
+                "[ExileRespawn] player=" + player.getScoreboardName()
+                        + ", keepInventory=" + keepInventory
+                        + ", removalReason=" + removalReason);
     }
 }
