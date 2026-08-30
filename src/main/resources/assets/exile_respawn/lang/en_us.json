@@ -1,8 +1,8 @@
 {
-    "gamerule.exile_respawn.exile_respawn": "Exile Respawn",
-    "gamerule.exile_respawn.exile_respawn.description": "When enabled, players respawn far away from their death location.",
-    "gamerule.exile_respawn.exile_respawn_radius": "Exile Respawn Radius",
-    "gamerule.exile_respawn.exile_respawn_radius.description": "Base distance (in blocks) from the death location where the player respawns.",
-    "gamerule.exile_respawn.exile_respawn_looseness": "Exile Respawn Looseness",
-    "gamerule.exile_respawn.exile_respawn_looseness.description": "Random variation added to the respawn distance."
+    "gamerule.exile_respawn.enabled": "Exile Respawn",
+    "gamerule.exile_respawn.enabled.description": "When enabled, players respawn far away from their death location.",
+    "gamerule.exile_respawn.radius": "Exile Respawn Radius",
+    "gamerule.exile_respawn.radius.description": "Base distance (in blocks) from the death location where the player respawns.",
+    "gamerule.exile_respawn.looseness": "Exile Respawn Looseness",
+    "gamerule.exile_respawn.looseness.description": "Random variation added to the respawn distance."
 }

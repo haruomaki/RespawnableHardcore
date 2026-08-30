@@ -20,6 +20,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 @Mod(ExileRespawn.MODID)
 public class ExileRespawn {
     // Define mod id in a common place for everything to reference
+    // TODO: gradle.propertiesから読み込み
     public static final String MODID = "exile_respawn";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -67,30 +68,29 @@ public class ExileRespawn {
         RandomSource random = level.random;
 
         // Teleport the player if the world is not hardcore and the custom gamerule is enabled
-        // if (!level.getLevelData().isHardcore() && level.getGameRules().get(ExileRespawnGameRules.EXILE_RESPAWN.)) {
-        // // Configuration rules for calculation
-        // int radius = ExileRespawnGameRules.EXILE_RESPAWN_RADIUS.get().defaultValue();
-        // // int radius = level.getGameRules().get(ExileRespawnGameRules.EXILE_RESPAWN_RADIUS);
-        // int looseness = level.getGameRules().get(ExileRespawnGameRules.EXILE_RESPAWN_LOOSENESS);
-        // double distance = radius + (random.nextDouble() * 2 - 1) * looseness;
+        if (!level.getLevelData().isHardcore() && level.getGameRules().get(ExileRespawnGameRules.ENABLED.get())) {
+            // Configuration rules for calculation
+            int radius = level.getGameRules().get(ExileRespawnGameRules.RADIUS.get());
+            int looseness = level.getGameRules().get(ExileRespawnGameRules.LOOSENESS.get());
+            double distance = radius + (random.nextDouble() * 2 - 1) * looseness;
 
-        // // Target coordinates logic
-        // int deathX = deathPos.getX();
-        // int deathY = deathPos.getY();
-        // int deathZ = deathPos.getZ();
-        // double theta = random.nextDouble() * Math.PI * 2;
-        // int x = (int) (deathX + distance * Math.cos(theta));
-        // int z = (int) (deathZ + distance * Math.sin(theta));
+            // Target coordinates logic
+            int deathX = deathPos.getX();
+            int deathY = deathPos.getY();
+            int deathZ = deathPos.getZ();
+            double theta = random.nextDouble() * Math.PI * 2;
+            int x = (int) (deathX + distance * Math.cos(theta));
+            int z = (int) (deathZ + distance * Math.sin(theta));
 
-        // // Force load the chunk to find a safe surface height
-        // level.getChunk(x >> 4, z >> 4);
-        // int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            // Force load the chunk to find a safe surface height
+            level.getChunk(x >> 4, z >> 4);
+            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
 
-        // // Log details and execute teleportation
-        // LOGGER.debug("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
-        // LOGGER.debug(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
-        // LOGGER.debug("Respawn Position: ({}, {}, {})", x, y, z);
-        // player.teleportTo(x, y, z);
-        // }
+            // Log details and execute teleportation
+            LOGGER.debug("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
+            LOGGER.debug(String.format("Death Position: (%d, %d, %d), distance: %.1f, theta: %.1f°", deathX, deathY, deathZ, distance, theta * 180 / Math.PI));
+            LOGGER.debug("Respawn Position: ({}, {}, {})", x, y, z);
+            player.teleportTo(x, y, z);
+        }
     }
 }

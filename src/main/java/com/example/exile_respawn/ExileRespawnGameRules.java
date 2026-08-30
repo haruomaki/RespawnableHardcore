@@ -16,7 +16,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class ExileRespawnGameRules {
     public static final DeferredRegister<GameRule<?>> GAME_RULES = DeferredRegister.create(Registries.GAME_RULE, ExileRespawn.MODID);
 
-    public static final DeferredHolder<GameRule<?>, GameRule<Boolean>> EXILE_RESPAWN = GAME_RULES.register("exile_respawn", id -> new GameRule<>(
+    public static final DeferredHolder<GameRule<?>, GameRule<Boolean>> ENABLED = GAME_RULES.register("enabled", id -> new GameRule<>(
             GameRuleCategory.PLAYER,
             GameRuleType.BOOL,
             BoolArgumentType.bool(),
@@ -26,7 +26,7 @@ public class ExileRespawnGameRules {
             true,
             FeatureFlagSet.of()));
 
-    public static final DeferredHolder<GameRule<?>, GameRule<Integer>> EXILE_RESPAWN_RADIUS = GAME_RULES.register("exile_respawn_radius", id -> new GameRule<>(
+    public static final DeferredHolder<GameRule<?>, GameRule<Integer>> RADIUS = GAME_RULES.register("radius", id -> new GameRule<>(
             GameRuleCategory.PLAYER,
             GameRuleType.INT,
             IntegerArgumentType.integer(0),
@@ -36,7 +36,7 @@ public class ExileRespawnGameRules {
             10000,
             FeatureFlagSet.of()));
 
-    public static final DeferredHolder<GameRule<?>, GameRule<Integer>> EXILE_RESPAWN_LOOSENESS = GAME_RULES.register("exile_respawn_looseness", id -> new GameRule<>(
+    public static final DeferredHolder<GameRule<?>, GameRule<Integer>> LOOSENESS = GAME_RULES.register("looseness", id -> new GameRule<>(
             GameRuleCategory.PLAYER,
             GameRuleType.INT,
             IntegerArgumentType.integer(0),
