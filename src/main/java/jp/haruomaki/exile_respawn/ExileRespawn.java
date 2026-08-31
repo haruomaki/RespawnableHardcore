@@ -52,7 +52,7 @@ public class ExileRespawn {
      */
     private Vec3 calculateExileRespawnPos(ServerLevel level, Vec3 center) {
         // Configuration rules for calculation
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         int radius = level.getGameRules().get(ExileRespawnGameRules.RADIUS.get());
         int looseness = level.getGameRules().get(ExileRespawnGameRules.LOOSENESS.get());
         double distance = radius + (random.nextDouble() * 2.0D - 1.0D) * looseness;
@@ -113,6 +113,6 @@ public class ExileRespawn {
         LevelData.RespawnData respawnData = new LevelData.RespawnData(globalPos, 0.0F, 0.0F);
         ServerPlayer.RespawnConfig config = new ServerPlayer.RespawnConfig(respawnData, true);
         player.setRespawnPosition(config, true);
-        player.displayClientMessage(Component.literal("§4[Exile Respawn] This is your new place...💀"), false);
+        player.sendSystemMessage(Component.literal("§4[Exile Respawn] This is your new place...💀"));
     }
 }
