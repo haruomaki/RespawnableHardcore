@@ -3,9 +3,13 @@ package jp.haruomaki.exile_respawn;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
@@ -37,12 +41,43 @@ public class ExileRespawn {
     }
 
     /**
-     * Changes the player's respawn position when Exile Respawn is enabled.
+     * Calculates a random exile spot away from the original spawn.
      * <p>
-     * We keep the original respawn position as the center, then pick a random direction and distance and move the player away from it. The Y coordinate is adjusted to the surface height at the new location.
+     * Picks a random direction and distance based on gamerules, then forces a chunk load to find a safe surface height (no suffocating!).
      * </p>
+     *
+     * @param level  The server level for world and gamerule data.
+     * @param center The original spawn point we are pushing the player away from.
+     * @return A safe ground-level Vec3 for the new exile location.
+     */
+    private Vec3 calculateExileRespawnPos(ServerLevel level, Vec3 center) {
+        // Configuration rules for calculation
+        RandomSource random = level.random;
+        int radius = level.getGameRules().get(ExileRespawnGameRules.RADIUS.get());
+        int looseness = level.getGameRules().get(ExileRespawnGameRules.LOOSENESS.get());
+        double distance = radius + (random.nextDouble() * 2.0D - 1.0D) * looseness;
+
+        // Target coordinates logic
+        double theta = random.nextDouble() * Math.PI * 2.0D;
+        int x = (int) (center.x + distance * Math.cos(theta));
+        int z = (int) (center.z + distance * Math.sin(theta));
+
+        // Force load the chunk to find a safe surface height
+        level.getChunk(x >> 4, z >> 4);
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+
+        // Log details
+        LOGGER.info("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
+        LOGGER.info(String.format("Original Respawn Position: %s, distance: %.1f, theta: %.1f°", center.toString(), distance, theta * 180 / Math.PI));
+        LOGGER.info("Respawn Position: ({}, {}, {})", x, y, z);
+
+        return new Vec3(x, y, z);
+    }
+
+    /**
+     * Hijacks the player's respawn to banish them to the exile zone.
      * <p>
-     * Hardcore worlds are intentionally left untouched.
+     * Skips non-players and hardcore worlds. If the exile rule is on, it overrides the teleport destination and forces vanilla to lock this new position as their home sweet home.
      * </p>
      */
     @SubscribeEvent
@@ -53,39 +88,29 @@ public class ExileRespawn {
 
         // `.serverLevel()` has been removed in Minecraft 1.21.6 and later.
         var level = (ServerLevel) player.level();
-        RandomSource random = level.random;
 
         // Teleport the player if the world is not hardcore and the custom gamerule is enabled
         if (!level.getLevelData().isHardcore() && level.getGameRules().get(ExileRespawnGameRules.ENABLED.get())) {
-            // Configuration rules for calculation
-            int radius = level.getGameRules().get(ExileRespawnGameRules.RADIUS.get());
-            int looseness = level.getGameRules().get(ExileRespawnGameRules.LOOSENESS.get());
-            double distance = radius + (random.nextDouble() * 2 - 1) * looseness;
-
-            // Target coordinates logic
             var transition = event.getTeleportTransition();
-            var pos = transition.position();
-            double theta = random.nextDouble() * Math.PI * 2;
-            int x = (int) (pos.x + distance * Math.cos(theta));
-            int z = (int) (pos.z + distance * Math.sin(theta));
+            var customRespawnPos = calculateExileRespawnPos(level, transition.position());
 
-            // Force load the chunk to find a safe surface height
-            level.getChunk(x >> 4, z >> 4);
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            var newPos = new Vec3(x, y, z);
-
-            // Log details and execute teleportation
-            LOGGER.info("Exile Respawn! (Radius: {}, Looseness: {})", radius, looseness);
-            LOGGER.info(String.format("Original Respawn Position: (%.1f, %.1f, %.1f), distance: %.1f, theta: %.1f°", pos.x, pos.y, pos.z, distance, theta * 180 / Math.PI));
-            LOGGER.info("Respawn Position: ({}, {}, {})", x, y, z);
+            // Override the respawn position
             event.setTeleportTransition(new TeleportTransition(
                     level,
-                    newPos,
+                    customRespawnPos,
                     transition.deltaMovement(),
                     transition.yRot(),
                     transition.xRot(),
                     transition.relatives(),
                     transition.postTeleportTransition()));
+
+            // Update vanilla respawn config to lock the new location
+            BlockPos respawnPos = BlockPos.containing(customRespawnPos);
+            GlobalPos globalPos = new GlobalPos(level.dimension(), respawnPos);
+            LevelData.RespawnData respawnData = new LevelData.RespawnData(globalPos, 0.0F, 0.0F);
+            ServerPlayer.RespawnConfig config = new ServerPlayer.RespawnConfig(respawnData, true);
+            player.setRespawnPosition(config, true);
+            player.displayClientMessage(Component.literal("§4[Exile Respawn] This is your new place...💀"), false);
         }
     }
 }
