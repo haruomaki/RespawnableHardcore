@@ -89,28 +89,30 @@ public class ExileRespawn {
         // `.serverLevel()` has been removed in Minecraft 1.21.6 and later.
         var level = (ServerLevel) player.level();
 
-        // Teleport the player if the world is not hardcore and the custom gamerule is enabled
-        if (!level.getLevelData().isHardcore() && level.getGameRules().get(ExileRespawnGameRules.ENABLED.get())) {
-            var transition = event.getTeleportTransition();
-            var customRespawnPos = calculateExileRespawnPos(level, transition.position());
-
-            // Override the respawn position
-            event.setTeleportTransition(new TeleportTransition(
-                    level,
-                    customRespawnPos,
-                    transition.deltaMovement(),
-                    transition.yRot(),
-                    transition.xRot(),
-                    transition.relatives(),
-                    transition.postTeleportTransition()));
-
-            // Update vanilla respawn config to lock the new location
-            BlockPos respawnPos = BlockPos.containing(customRespawnPos);
-            GlobalPos globalPos = new GlobalPos(level.dimension(), respawnPos);
-            LevelData.RespawnData respawnData = new LevelData.RespawnData(globalPos, 0.0F, 0.0F);
-            ServerPlayer.RespawnConfig config = new ServerPlayer.RespawnConfig(respawnData, true);
-            player.setRespawnPosition(config, true);
-            player.displayClientMessage(Component.literal("§4[Exile Respawn] This is your new place...💀"), false);
+        // Skip if hardcore or if the custom gamerule is disabled
+        if (level.getLevelData().isHardcore() || !level.getGameRules().get(ExileRespawnGameRules.ENABLED.get())) {
+            return;
         }
+
+        var transition = event.getTeleportTransition();
+        var customRespawnPos = calculateExileRespawnPos(level, transition.position());
+
+        // Override the respawn position
+        event.setTeleportTransition(new TeleportTransition(
+                level,
+                customRespawnPos,
+                transition.deltaMovement(),
+                transition.yRot(),
+                transition.xRot(),
+                transition.relatives(),
+                transition.postTeleportTransition()));
+
+        // Update vanilla respawn config to lock the new location
+        BlockPos respawnPos = BlockPos.containing(customRespawnPos);
+        GlobalPos globalPos = new GlobalPos(level.dimension(), respawnPos);
+        LevelData.RespawnData respawnData = new LevelData.RespawnData(globalPos, 0.0F, 0.0F);
+        ServerPlayer.RespawnConfig config = new ServerPlayer.RespawnConfig(respawnData, true);
+        player.setRespawnPosition(config, true);
+        player.displayClientMessage(Component.literal("§4[Exile Respawn] This is your new place...💀"), false);
     }
 }
